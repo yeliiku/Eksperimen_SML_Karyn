@@ -24,9 +24,23 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Show initial files
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Files in root:"
+          ls -la
+          echo "Files in data:"
+          ls -la data
+
+      - name: Ensure output folder exists
+        run: mkdir -p output
+
       - name: Run preprocessing
         run: |
           python src/automate_Karyn.py
+
+      - name: Show output folder content
+        run: ls -la output
 
       - name: Commit processed dataset
         run: |
