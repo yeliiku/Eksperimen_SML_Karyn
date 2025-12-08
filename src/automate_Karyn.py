@@ -42,8 +42,11 @@ if __name__ == "__main__":
     X_train, X_test, y_train, y_test, preprocessor = preprocess_heart_dataset("data/heart.csv")
 
     if hasattr(X_train, "toarray"):
-        np.savetxt("output/processed_dataset.csv", X_train.toarray(), delimiter=",")
+        X_train_df = pd.DataFrame(X_train.toarray())
     else:
-        np.savetxt("output/processed_dataset.csv", X_train, delimiter=",")
+        X_train_df = pd.DataFrame(X_train)
+
+    X_train_df['target'] = y_train.values
+    X_train_df.to_csv("output/processed_dataset.csv", index=False)
 
     print("Preprocessing selesai. File tersimpan di output/processed_dataset.csv")
