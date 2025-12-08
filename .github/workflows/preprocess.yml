@@ -1,32 +1,43 @@
-steps:
-  - name: Checkout repository
-    uses: actions/checkout@v3
+name: Preprocess Data
 
-  - name: Set up Python 3.10
-    uses: actions/setup-python@v4
-    with:
-      python-version: "3.10"
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
 
-  - name: Install dependencies
-    run: |
-      pip install --upgrade pip
-      pip install -r requirements.txt
+jobs:                       # <-- ini wajib
+  preprocessing:            # nama job
+    runs-on: ubuntu-latest
+    steps:                  # <-- steps ada di dalam job
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-  - name: Ensure output folder exists
-    run: mkdir -p output
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
 
-  - name: Run preprocessing
-    run: python src/automate_Karyn.py
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
 
-  - name: Commit processed dataset if changed
-    run: |
-      git config --local user.email "actions@github.com"
-      git config --local user.name "GitHub Actions"
-      git add output/processed_dataset.csv
-      git diff --cached --quiet || git commit -m "Update processed dataset"
+      - name: Ensure output folder exists
+        run: mkdir -p output
 
-  - name: Push changes using PAT
-    uses: ad-m/github-push-action@v0.8.0
-    with:
-      github_token: ${{ secrets.PAT_TOKEN }}
-      branch: main
+      - name: Run preprocessing
+        run: python src/automate_Karyn.py
+
+      - name: Commit processed dataset if changed
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add output/processed_dataset.csv
+          git diff --cached --quiet || git commit -m "Update processed dataset"
+
+      - name: Push changes using PAT
+        uses: ad-m/github-push-action@v0.8.0
+        with:
+          github_token: ${{ secrets.PAT_TOKEN }}
+          branch: main
