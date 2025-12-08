@@ -36,8 +36,7 @@ jobs:
           git add output/processed_dataset.csv
           git diff --cached --quiet || git commit -m "Update processed dataset"
 
-      - name: Push changes using PAT
+      - name: Push
         uses: ad-m/github-push-action@v0.8.0
         with:
-          github_token: ${{ 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 }}
           branch: main
