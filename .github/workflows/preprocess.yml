@@ -26,7 +26,7 @@ jobs:
 
     - name: Run preprocessing
       run: |
-        python src/automate_Nama-siswa.py
+        python src/automate_Karyn.py
 
     - name: Commit processed dataset
       run: |
