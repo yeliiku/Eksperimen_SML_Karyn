@@ -24,11 +24,9 @@ jobs:
         pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Ensure output folder exists
-      run: mkdir -p output
-
     - name: Run preprocessing
-      run: python src/automate_Nama-siswa.py
+      run: |
+        python src/automate_Nama-siswa.py
 
     - name: Commit processed dataset
       run: |
