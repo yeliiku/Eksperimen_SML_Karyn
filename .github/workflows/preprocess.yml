@@ -11,32 +11,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.10"
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
 
-    - name: Install dependencies
-      run: |
-        pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
 
-    - name: Run preprocessing
-      run: |
-        python src/automate_Karyn.py
+      - name: Run preprocessing
+        run: |
+          python src/automate_Karyn.py
 
-    - name: Commit processed dataset
-      run: |
-        git config --local user.email "actions@github.com"
-        git config --local user.name "GitHub Actions"
-        git add output/processed_dataset.csv
-        git commit -m "Update processed dataset" || echo "No changes to commit"
+      - name: Commit processed dataset
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add output/processed_dataset.csv
+          git commit -m "Update processed dataset" || echo "No changes to commit"
 
-    - name: Push changes
-      uses: ad-m/github-push-action@v0.8.0
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: main
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.8.0
+        with:
+          github_token: ${{ secrets.PAT_TOKEN }}
+          branch: main
