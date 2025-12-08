@@ -1,56 +1,32 @@
-name: Preprocess Data
+steps:
+  - name: Checkout repository
+    uses: actions/checkout@v3
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
+  - name: Set up Python 3.10
+    uses: actions/setup-python@v4
+    with:
+      python-version: "3.10"
 
-jobs:
-  preprocessing:
-    runs-on: ubuntu-latest
+  - name: Install dependencies
+    run: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
 
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+  - name: Ensure output folder exists
+    run: mkdir -p output
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
+  - name: Run preprocessing
+    run: python src/automate_Karyn.py
 
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
+  - name: Commit processed dataset if changed
+    run: |
+      git config --local user.email "actions@github.com"
+      git config --local user.name "GitHub Actions"
+      git add output/processed_dataset.csv
+      git diff --cached --quiet || git commit -m "Update processed dataset"
 
-      - name: Show initial files
-        run: |
-          echo "Current directory: $(pwd)"
-          echo "Files in root:"
-          ls -la
-          echo "Files in data:"
-          ls -la data
-
-      - name: Ensure output folder exists
-        run: mkdir -p output
-
-      - name: Run preprocessing
-        run: |
-          python src/automate_Karyn.py
-
-      - name: Show output folder content
-        run: ls -la output
-
-      - name: Commit processed dataset
-        run: |
-          git config --local user.email "actions@github.com"
-          git config --local user.name "GitHub Actions"
-          git add output/processed_dataset.csv
-          git commit -m "Update processed dataset" || echo "No changes to commit"
-
-      - name: Push changes
-        uses: ad-m/github-push-action@v0.8.0
-        with:
-          github_token: ${{ secrets.PAT_TOKEN }}
-          branch: main
+  - name: Push changes using PAT
+    uses: ad-m/github-push-action@v0.8.0
+    with:
+      github_token: ${{ secrets.PAT_TOKEN }}
+      branch: main
