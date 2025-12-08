@@ -6,10 +6,10 @@ on:
     branches:
       - main
 
-jobs:                       # <-- ini wajib
-  preprocessing:            # nama job
+jobs:               
+  preprocessing:          
     runs-on: ubuntu-latest
-    steps:                  # <-- steps ada di dalam job
+    steps:              
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -39,5 +39,5 @@ jobs:                       # <-- ini wajib
       - name: Push changes using PAT
         uses: ad-m/github-push-action@v0.8.0
         with:
-          github_token: ${{ secrets.PAT_TOKEN }}
+          github_token: ${{ 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 }}
           branch: main
