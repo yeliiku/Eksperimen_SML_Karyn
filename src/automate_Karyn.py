@@ -1,12 +1,14 @@
 import pandas as pd
+import numpy as np
 import os
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 
-def preprocess_heart_dataset(csv_path: str, output_path: str):
+def preprocess_heart_dataset(csv_path: str):
     df = pd.read_csv(csv_path, na_values='?')
     df = df.dropna()
+
     df['target'] = df['target'].apply(lambda x: 1 if x > 0 else 0)
 
     X = df.drop(columns=['target'])
@@ -30,16 +32,30 @@ def preprocess_heart_dataset(csv_path: str, output_path: str):
     )
 
     X_train_processed = preprocessor.fit_transform(X_train)
+    X_test_processed = preprocessor.transform(X_test)
 
-    # simpan ke CSV
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    if hasattr(X_train_processed, "toarray"):
-        X_train_df = pd.DataFrame(X_train_processed.toarray())
-    else:
-        X_train_df = pd.DataFrame(X_train_processed)
-    X_train_df['target'] = y_train.values
-    X_train_df.to_csv(output_path, index=False)
-    print(f"Preprocessing selesai. File tersimpan di {output_path}")
+    return X_train_processed, X_test_processed, y_train, y_test, preprocessor
 
 if __name__ == "__main__":
-    preprocess_heart_dataset("data/heart.csv", "output/processed_dataset.csv")
+    try:
+        os.makedirs("output", exist_ok=True)
+
+        # Debug: cek folder data dan file
+        print("Current dir:", os.getcwd())
+        print("Files in root:", os.listdir("."))
+        print("Files in data/:", os.listdir("data"))
+
+        X_train, X_test, y_train, y_test, preprocessor = preprocess_heart_dataset("data/heart.csv")
+
+        if hasattr(X_train, "toarray"):
+            X_train_df = pd.DataFrame(X_train.toarray())
+        else:
+            X_train_df = pd.DataFrame(X_train)
+
+        X_train_df['target'] = y_train.values
+        X_train_df.to_csv("output/processed_dataset.csv", index=False)
+
+        print("Preprocessing selesai. File tersimpan di output/processed_dataset.csv")
+    except Exception as e:
+        print("Error saat preprocessing:", e)
+        raise
