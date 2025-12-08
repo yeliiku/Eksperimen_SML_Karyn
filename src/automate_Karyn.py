@@ -1,4 +1,6 @@
 import pandas as pd
+import numpy as np
+import os
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
@@ -33,3 +35,15 @@ def preprocess_heart_dataset(csv_path: str):
     X_test_processed = preprocessor.transform(X_test)
 
     return X_train_processed, X_test_processed, y_train, y_test, preprocessor
+
+if __name__ == "__main__":
+    os.makedirs("output", exist_ok=True)
+
+    X_train, X_test, y_train, y_test, preprocessor = preprocess_heart_dataset("data/heart.csv")
+
+    if hasattr(X_train, "toarray"):
+        np.savetxt("output/processed_dataset.csv", X_train.toarray(), delimiter=",")
+    else:
+        np.savetxt("output/processed_dataset.csv", X_train, delimiter=",")
+
+    print("Preprocessing selesai. File tersimpan di output/processed_dataset.csv")
