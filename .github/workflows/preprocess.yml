@@ -1,4 +1,4 @@
-name: Preprocess Data
+name: CI/CD Pipeline
 
 on:
   workflow_dispatch:
@@ -6,14 +6,18 @@ on:
     branches:
       - main
 
-jobs:               
-  preprocessing:          
+permissions:
+  contents: write
+
+jobs:
+  preprocessing:
     runs-on: ubuntu-latest
-    steps:              
-      - name: Checkout repository
+
+    steps:
+      - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Set up Python 3.10
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
@@ -23,20 +27,23 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Ensure output folder exists
-        run: mkdir -p output
-
       - name: Run preprocessing
-        run: python src/automate_Karyn.py
+        run: |
+          python src/automate_Karyn.py
 
-      - name: Commit processed dataset if changed
+      - name: Ensure output folder exists
+        run: |
+          mkdir -p output
+
+      - name: Commit processed dataset
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
           git add output/processed_dataset.csv
-          git diff --cached --quiet || git commit -m "Update processed dataset"
+          git commit -m "Update processed dataset" || echo "No changes to commit"
 
-      - name: Push
+      - name: Push changes
         uses: ad-m/github-push-action@v0.8.0
         with:
+          github_token: ${{ secrets.PAT_TOKEN }}
           branch: main
