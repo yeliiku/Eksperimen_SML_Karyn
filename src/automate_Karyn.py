@@ -5,6 +5,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 
+print("Current dir:", os.getcwd())
+print("Files:", os.listdir("data"))
+
 def preprocess_heart_dataset(csv_path: str):
     df = pd.read_csv(csv_path, na_values='?')
     df = df.dropna()
