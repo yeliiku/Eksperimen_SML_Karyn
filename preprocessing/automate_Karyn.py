@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
+import os
 
 def preprocess_dataset(csv_path: str) -> pd.DataFrame:
     df = pd.read_csv(csv_path, na_values='?')
@@ -18,7 +19,7 @@ def preprocess_dataset(csv_path: str) -> pd.DataFrame:
     preprocessor = ColumnTransformer(
         transformers=[
             ('num', StandardScaler(), num_features),
-            ('cat', OneHotEncoder(handle_unknown='ignore'), cat_features)
+            ('cat', OneHotEncoder(handle_unknown='ignore', sparse=False), cat_features)
         ]
     )
 
@@ -26,22 +27,18 @@ def preprocess_dataset(csv_path: str) -> pd.DataFrame:
 
     feature_names = (
         num_features +
-        list(
-            preprocessor
-            .named_transformers_['cat']
-            .get_feature_names_out(cat_features)
-        )
+        list(preprocessor.named_transformers_['cat']
+             .get_feature_names_out(cat_features))
     )
 
-    X_processed_df = pd.DataFrame(
-        X_processed.toarray(),
-        columns=feature_names
-    )
+    processed_df = pd.DataFrame(X_processed, columns=feature_names)
+    processed_df['target'] = y.values
 
-    X_processed_df['target'] = y.values
+    return processed_df
 
-    return X_processed_df
 
 if __name__ == "__main__":
+    os.makedirs("preprocessing", exist_ok=True)
+
     processed_df = preprocess_dataset("dataset_raw.csv")
     processed_df.to_csv("processed_dataset.csv", index=False)
