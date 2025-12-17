@@ -38,10 +38,6 @@ def preprocess_heart_dataset(csv_path: str):
 
 if __name__ == "__main__":
     try:
-        print("Current dir:", os.getcwd())
-        print("Files in root:", os.listdir("."))
-        print("Files in data/:", os.listdir("data"))
-
         X_train, X_test, y_train, y_test, preprocessor = preprocess_heart_dataset("../dataset_raw.csv")
 
         if hasattr(X_train, "toarray"):
