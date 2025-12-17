@@ -29,17 +29,13 @@ jobs:
 
       - name: Run preprocessing
         run: |
-          python src/automate_Karyn.py
-
-      - name: Ensure output folder exists
-        run: |
-          mkdir -p output
+          python preprocessing/automate_Karyn.py
 
       - name: Commit processed dataset
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
-          git add output/processed_dataset.csv
+          git add preprocessing/processed_dataset.csv
           git commit -m "Update processed dataset" || echo "No changes to commit"
 
       - name: Push changes

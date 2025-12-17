@@ -38,14 +38,11 @@ def preprocess_heart_dataset(csv_path: str):
 
 if __name__ == "__main__":
     try:
-        os.makedirs("output", exist_ok=True)
-
-        # Debug: cek folder data dan file
         print("Current dir:", os.getcwd())
         print("Files in root:", os.listdir("."))
         print("Files in data/:", os.listdir("data"))
 
-        X_train, X_test, y_train, y_test, preprocessor = preprocess_heart_dataset("data/heart.csv")
+        X_train, X_test, y_train, y_test, preprocessor = preprocess_heart_dataset("../dataset_raw.csv")
 
         if hasattr(X_train, "toarray"):
             X_train_df = pd.DataFrame(X_train.toarray())
@@ -53,9 +50,8 @@ if __name__ == "__main__":
             X_train_df = pd.DataFrame(X_train)
 
         X_train_df['target'] = y_train.values
-        X_train_df.to_csv("output/processed_dataset.csv", index=False)
+        X_train_df.to_csv("processed_dataset.csv", index=False)
 
-        print("Preprocessing selesai. File tersimpan di output/processed_dataset.csv")
     except Exception as e:
         print("Error saat preprocessing:", e)
         raise
