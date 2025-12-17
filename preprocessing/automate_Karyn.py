@@ -1,53 +1,47 @@
 import pandas as pd
-import numpy as np
-import os
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 
-def preprocess_heart_dataset(csv_path: str):
+def preprocess_dataset(csv_path: str) -> pd.DataFrame:
     df = pd.read_csv(csv_path, na_values='?')
-    df = df.dropna()
+
+    df = df.dropna().reset_index(drop=True)
 
     df['target'] = df['target'].apply(lambda x: 1 if x > 0 else 0)
 
     X = df.drop(columns=['target'])
     y = df['target']
 
-    num_features = ['age','trestbps','chol','thalach','oldpeak']
-    cat_features = ['sex','cp','fbs','restecg','exang','slope','ca','thal']
-
-    numeric_transformer = StandardScaler()
-    categorical_transformer = OneHotEncoder(handle_unknown='ignore')
+    num_features = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
+    cat_features = ['sex', 'cp', 'fbs', 'restecg', 'exang', 'slope', 'ca', 'thal']
 
     preprocessor = ColumnTransformer(
         transformers=[
-            ('num', numeric_transformer, num_features),
-            ('cat', categorical_transformer, cat_features)
+            ('num', StandardScaler(), num_features),
+            ('cat', OneHotEncoder(handle_unknown='ignore'), cat_features)
         ]
     )
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42, stratify=y
+    X_processed = preprocessor.fit_transform(X)
+
+    feature_names = (
+        num_features +
+        list(
+            preprocessor
+            .named_transformers_['cat']
+            .get_feature_names_out(cat_features)
+        )
     )
 
-    X_train_processed = preprocessor.fit_transform(X_train)
-    X_test_processed = preprocessor.transform(X_test)
+    X_processed_df = pd.DataFrame(
+        X_processed.toarray(),
+        columns=feature_names
+    )
 
-    return X_train_processed, X_test_processed, y_train, y_test, preprocessor
+    X_processed_df['target'] = y.values
+
+    return X_processed_df
 
 if __name__ == "__main__":
-    try:
-        X_train, X_test, y_train, y_test, preprocessor = preprocess_heart_dataset("dataset_raw.csv")
-
-        if hasattr(X_train, "toarray"):
-            X_train_df = pd.DataFrame(X_train.toarray())
-        else:
-            X_train_df = pd.DataFrame(X_train)
-
-        X_train_df['target'] = y_train.values
-        X_train_df.to_csv("processed_dataset.csv", index=False)
-
-    except Exception as e:
-        print("Error saat preprocessing:", e)
-        raise
+    processed_df = preprocess_dataset("dataset_raw.csv")
+    processed_df.to_csv("processed_dataset.csv", index=False)
